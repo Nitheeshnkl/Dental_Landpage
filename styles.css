@@ -1,0 +1,332 @@
+/* ==========================================================================
+   YOUR DENTAL CLINIC by S2 — Luxury Dental Care Design System
+   Scroll-Controlled Video Hero, Frosted Navbar & Architecture
+   ========================================================================== */
+
+:root {
+  /* Master Healthcare Brand Palette */
+  --color-deep-teal: #002B2B;
+  --color-dark-emerald: #073C38;
+  --color-primary-mint: #2DD4BF;
+  --color-pale-mint: #CFF8EE;
+  --color-soft-ivory: #F7F8F3;
+  --color-warm-white: #FFFFFF;
+  --color-muted-sage: #A9C5B7;
+  --color-neutral-text: #607572;
+  --color-heading-charcoal: #0B2421;
+
+  /* Glassmorphism Tokens */
+  --glass-dark-bg: rgba(5, 39, 37, 0.72);
+  --glass-dark-border: rgba(45, 212, 191, 0.18);
+  --glass-light-bg: rgba(255, 255, 255, 0.92);
+  --glass-light-border: rgba(7, 60, 56, 0.1);
+
+  /* Shadow & Glow */
+  --glow-mint: rgba(45, 212, 191, 0.35);
+  --shadow-subtle: 0 10px 30px -10px rgba(0, 43, 43, 0.08);
+  --shadow-elevated: 0 20px 40px -15px rgba(0, 43, 43, 0.14);
+
+  /* Easing */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html {
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--color-heading-charcoal);
+  background-color: var(--color-soft-ivory);
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, .font-heading {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: -0.025em;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-deep-teal);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-dark-emerald);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-mint);
+}
+
+/* ==========================================================================
+   Priority 1 & 3: Refined Frosted-Glass Navbar & Brand Lockup
+   ========================================================================== */
+.navbar-frosted {
+  background: var(--glass-dark-bg);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border-bottom: 1px solid var(--glass-dark-border);
+  transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.navbar-frosted.scrolled-light {
+  background: var(--glass-light-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--glass-light-border);
+  box-shadow: 0 4px 20px -2px rgba(0, 43, 43, 0.06);
+}
+
+.navbar-frosted.scrolled-light .nav-link {
+  color: var(--color-deep-teal);
+}
+.navbar-frosted.scrolled-light .nav-link:hover {
+  color: var(--color-dark-emerald);
+}
+.navbar-frosted.scrolled-light .nav-brand-main {
+  color: var(--color-deep-teal);
+}
+.navbar-frosted.scrolled-light .nav-brand-sub {
+  color: var(--color-neutral-text);
+}
+.navbar-frosted.scrolled-light .nav-brand-icon {
+  background: var(--color-pale-mint);
+  color: var(--color-dark-emerald);
+  border-color: rgba(7, 60, 56, 0.15);
+}
+
+/* Coherent Brand Lockup Unit */
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.brand-emblem {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, rgba(45, 212, 191, 0.2) 0%, rgba(7, 60, 56, 0.8) 100%);
+  border: 1px solid rgba(45, 212, 191, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary-mint);
+  flex-shrink: 0;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.brand-lockup:hover .brand-emblem {
+  transform: scale(1.05);
+  border-color: var(--color-primary-mint);
+}
+
+/* ==========================================================================
+   Priority 2: Scroll-Controlled Video Hero Track
+   ========================================================================== */
+#hero-scrolly-container {
+  position: relative;
+  height: 350vh; /* Controlled scrub duration */
+  background-color: var(--color-deep-teal);
+}
+
+#hero-pinned-stage {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-deep-teal);
+}
+
+.hero-video-scrub-element {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* High-Contrast Gradient & Vignette to Keep Text 100% Readable */
+.hero-vignette-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(circle at 65% 50%, rgba(0, 43, 43, 0.2) 0%, rgba(0, 43, 43, 0.5) 45%, rgba(0, 43, 43, 0.94) 85%),
+              linear-gradient(90deg, rgba(0, 43, 43, 0.95) 0%, rgba(0, 43, 43, 0.82) 42%, rgba(0, 43, 43, 0.25) 75%, transparent 100%),
+              linear-gradient(180deg, rgba(0, 43, 43, 0.7) 0%, transparent 15%, transparent 80%, rgba(0, 43, 43, 0.95) 100%);
+}
+
+.hero-grid-pattern {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(45, 212, 191, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(45, 212, 191, 0.03) 1px, transparent 1px);
+}
+
+/* Scroll-Synced Narrative Beat Layers */
+.narrative-beat {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px);
+  transition: opacity 0.45s var(--ease-out-expo), transform 0.45s var(--ease-out-expo);
+}
+
+.narrative-beat.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* Glass Panels */
+.glass-panel-dark {
+  background: rgba(7, 60, 56, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(45, 212, 191, 0.2);
+}
+
+.glass-panel-light {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(7, 60, 56, 0.08);
+}
+
+/* Mint Buttons */
+.btn-mint-primary {
+  background-color: var(--color-primary-mint);
+  color: var(--color-deep-teal);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 25px rgba(45, 212, 191, 0.35);
+  transition: all 0.3s var(--ease-out-expo);
+}
+
+.btn-mint-primary:hover {
+  background-color: #5eead4;
+  box-shadow: 0 0 35px rgba(45, 212, 191, 0.55);
+  transform: translateY(-1px);
+}
+
+.btn-mint-primary:active {
+  transform: translateY(1px);
+}
+
+.btn-mint-primary::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(60deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%);
+  transform: rotate(25deg) translateY(-100%);
+  transition: transform 0.75s ease-out;
+}
+
+.btn-mint-primary:hover::after {
+  transform: rotate(25deg) translateY(100%);
+}
+
+.mint-gradient-text {
+  background: linear-gradient(135deg, #2DD4BF 0%, #CFF8EE 50%, #FFFFFF 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Priority 4: Treatment Card System */
+.treatment-card-v2 {
+  transition: transform 0.35s var(--ease-out-expo), box-shadow 0.35s var(--ease-out-expo), border-color 0.3s ease;
+}
+
+.treatment-card-v2:hover {
+  transform: translateY(-6px);
+  border-color: var(--color-primary-mint);
+  box-shadow: 0 20px 35px -10px rgba(0, 43, 43, 0.12);
+}
+
+.treatment-card-v2:hover .card-img-zoom {
+  transform: scale(1.05);
+}
+
+/* Interactive Timeline Step Cards */
+.journey-step {
+  transition: all 0.3s var(--ease-out-expo);
+  cursor: pointer;
+}
+
+.journey-step.active {
+  border-color: var(--color-primary-mint);
+  background-color: rgba(207, 248, 238, 0.35);
+  box-shadow: 0 15px 30px -10px rgba(7, 60, 56, 0.1);
+}
+
+/* Modals & Drawers */
+.drawer-backdrop {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.drawer-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.drawer-panel {
+  transform: translateX(100%);
+  transition: transform 0.4s var(--ease-out-expo);
+}
+
+.drawer-backdrop.open .drawer-panel {
+  transform: translateX(0);
+}
+
+.modal-backdrop {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content {
+  transform: scale(0.95) translateY(15px);
+  transition: transform 0.35s var(--ease-out-expo);
+}
+
+.modal-backdrop.open .modal-content {
+  transform: scale(1) translateY(0);
+}
+
+/* Scrub Pill in Pinned Hero */
+.scroll-progress-pill {
+  background: rgba(5, 39, 37, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(45, 212, 191, 0.25);
+}
