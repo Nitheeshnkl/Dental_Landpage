@@ -1,0 +1,10 @@
+# OS & Workspace
+.DS_Store
+*.code-workspace
+
+# Agent & Skill artifacts
+.agents/
+AGENTS.md
+GEMINI.md
+skills-lock.json
+.taste-skill/

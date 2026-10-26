@@ -130,36 +130,48 @@ h1, h2, h3, h4, .font-heading {
 }
 
 /* ==========================================================================
-   Priority 2: Scroll-Controlled Video Hero Track
+   Priority 2: Cinematic Background Video Hero (Natural Fluid Scroll)
    ========================================================================== */
-#hero-scrolly-container {
+#hero {
   position: relative;
-  height: 350vh; /* Controlled scrub duration */
-  background-color: var(--color-deep-teal);
-}
-
-#hero-pinned-stage {
-  position: sticky;
-  top: 0;
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 90vh;
+  min-height: 90svh;
   display: flex;
   align-items: center;
-  justify-content: center;
   background-color: var(--color-deep-teal);
+  overflow: hidden;
 }
 
-.hero-video-scrub-element {
+@media (min-width: 1024px) {
+  #hero {
+    min-height: 96vh;
+    min-height: 96svh;
+  }
+}
+
+.hero-video-wrapper {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.hero-background-video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  transform: translate(-50%, -50%) scale(1.05);
   object-fit: cover;
   object-position: center center;
-  z-index: 1;
   pointer-events: none;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
 }
 
 /* High-Contrast Gradient & Vignette to Keep Text 100% Readable */
@@ -168,9 +180,9 @@ h1, h2, h3, h4, .font-heading {
   inset: 0;
   z-index: 2;
   pointer-events: none;
-  background: radial-gradient(circle at 65% 50%, rgba(0, 43, 43, 0.2) 0%, rgba(0, 43, 43, 0.5) 45%, rgba(0, 43, 43, 0.94) 85%),
-              linear-gradient(90deg, rgba(0, 43, 43, 0.95) 0%, rgba(0, 43, 43, 0.82) 42%, rgba(0, 43, 43, 0.25) 75%, transparent 100%),
-              linear-gradient(180deg, rgba(0, 43, 43, 0.7) 0%, transparent 15%, transparent 80%, rgba(0, 43, 43, 0.95) 100%);
+  background: radial-gradient(circle at 72% 50%, rgba(0, 43, 43, 0.15) 0%, rgba(0, 43, 43, 0.6) 45%, rgba(0, 43, 43, 0.96) 88%),
+              linear-gradient(90deg, rgba(0, 43, 43, 0.98) 0%, rgba(0, 43, 43, 0.88) 42%, rgba(0, 43, 43, 0.4) 75%, transparent 100%),
+              linear-gradient(180deg, rgba(0, 43, 43, 0.75) 0%, transparent 20%, transparent 80%, rgba(0, 43, 43, 0.98) 100%);
 }
 
 .hero-grid-pattern {
@@ -180,28 +192,9 @@ h1, h2, h3, h4, .font-heading {
     linear-gradient(to bottom, rgba(45, 212, 191, 0.03) 1px, transparent 1px);
 }
 
-/* Scroll-Synced Narrative Beat Layers */
-.narrative-beat {
-  position: absolute;
-  inset: 0;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(20px);
-  transition: opacity 0.45s var(--ease-out-expo), transform 0.45s var(--ease-out-expo);
-}
-
-.narrative-beat.active {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-}
-
 /* Glass Panels */
 .glass-panel-dark {
-  background: rgba(7, 60, 56, 0.7);
+  background: rgba(7, 60, 56, 0.75);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(45, 212, 191, 0.2);
@@ -324,9 +317,119 @@ h1, h2, h3, h4, .font-heading {
   transform: scale(1) translateY(0);
 }
 
-/* Scrub Pill in Pinned Hero */
-.scroll-progress-pill {
-  background: rgba(5, 39, 37, 0.85);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(45, 212, 191, 0.25);
+/* ==========================================================================
+   MASCOT SYSTEM & MICRO-INTERACTIONS
+   ========================================================================== */
+.mascot-avatar-container {
+  position: relative;
+  transition: transform 0.35s var(--ease-out-expo);
 }
+
+.mascot-avatar-container:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+.mascot-float-anim {
+  animation: mascotSubtleFloat 4s ease-in-out infinite;
+}
+
+@keyframes mascotSubtleFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(1deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mascot-float-anim {
+    animation: none !important;
+  }
+  .btn-mint-primary::after {
+    display: none !important;
+  }
+  .treatment-card-v2:hover {
+    transform: none !important;
+  }
+}
+
+/* ==========================================================================
+   FLOATING DENTAL CONCIERGE (QUICK FAQ & CLINIC GUIDE)
+   ========================================================================== */
+.concierge-floating-trigger {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.5rem 1rem 0.5rem 0.5rem;
+  background: var(--color-deep-teal);
+  color: #FFFFFF;
+  border-radius: 9999px;
+  border: 1px solid rgba(45, 212, 191, 0.35);
+  box-shadow: 0 10px 30px -5px rgba(0, 43, 43, 0.35), 0 0 20px rgba(45, 212, 191, 0.25);
+  cursor: pointer;
+  transition: all 0.3s var(--ease-out-expo);
+}
+
+.concierge-floating-trigger:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 15px 35px -5px rgba(0, 43, 43, 0.45), 0 0 25px rgba(45, 212, 191, 0.4);
+  border-color: var(--color-primary-mint);
+}
+
+.concierge-avatar {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 9999px;
+  overflow: hidden;
+  border: 2px solid var(--color-primary-mint);
+  background: var(--color-pale-mint);
+  flex-shrink: 0;
+}
+
+.concierge-panel {
+  position: fixed;
+  bottom: 5.5rem;
+  right: 1.5rem;
+  width: 90vw;
+  max-width: 380px;
+  max-height: 80vh;
+  background: #FFFFFF;
+  border-radius: 1.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 43, 43, 0.25), 0 0 0 1px rgba(7, 60, 56, 0.08);
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px) scale(0.95);
+  transition: all 0.3s var(--ease-out-expo);
+}
+
+.concierge-panel.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+/* Centralized Image Fallback Styling */
+img.img-fallback-active {
+  background-color: var(--color-pale-mint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  object-fit: cover;
+}
+
+/* Accessibility Focus States */
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid var(--color-primary-mint);
+  outline-offset: 2px;
+}
+
+/* End of stylesheet */

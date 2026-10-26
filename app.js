@@ -1,16 +1,19 @@
 /**
  * YOUR DENTAL CLINIC by S2 — Luxury Dental Experience Engine
- * Scroll-Controlled Video Scrubbing, Frosted Navbar & Interactive Components
+ * Cinematic Background Video Hero, Frosted Navbar, 3D Mascot & Interactive Components
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+  initImageFallbacks();
   initFrostedNavbar();
-  initScrollControlledHeroVideo();
+  initHeroBackgroundVideo();
   initLiveClinicStatus();
   initTreatmentsExplorer();
   initBookingModal();
   initPatientJourney();
-  initTestimonialsSlider();
+  initPatientComfort();
+  initDentalConcierge();
+  initMascotInteractions();
   initMobileNav();
   initCopyrightYear();
 });
@@ -20,13 +23,13 @@ document.addEventListener('DOMContentLoaded', () => {
    ========================================================================== */
 function initFrostedNavbar() {
   const navbar = document.getElementById('main-navbar');
-  const heroContainer = document.getElementById('hero-scrolly-container');
+  const heroSection = document.getElementById('hero');
   if (!navbar) return;
 
   function updateNavbar() {
     const scrollY = window.scrollY;
-    // Calculate where the hero container ends
-    const heroEnd = heroContainer ? (heroContainer.offsetTop + heroContainer.offsetHeight - 120) : 600;
+    // Calculate where the hero ends
+    const heroEnd = heroSection ? (heroSection.offsetTop + heroSection.offsetHeight - 90) : 500;
 
     if (scrollY > heroEnd) {
       // Over light content sections
@@ -42,149 +45,105 @@ function initFrostedNavbar() {
 }
 
 /* ==========================================================================
-   2. PRIORITY 2: SCROLL-CONTROLLED 10-SECOND TOOTH VIDEO ANIMATION
+   2. PRIMARY HERO: BACKGROUND VIDEO & REFINED NATURAL SCROLL
    ========================================================================== */
-function initScrollControlledHeroVideo() {
-  const container = document.getElementById('hero-scrolly-container');
-  const video = document.getElementById('hero-tooth-video');
-  const scrubFill = document.getElementById('scroll-progress-fill');
-  const scrubPercent = document.getElementById('scroll-progress-percent');
-  const beatPills = document.querySelectorAll('.scroll-beat-pip');
+function initHeroBackgroundVideo() {
+  const video = document.getElementById('hero-background-video');
+  const heroSection = document.getElementById('hero');
+  if (!video || !heroSection) return;
 
-  if (!container || !video) return;
-
-  let targetTime = 0;
-  let currentScrubTime = 0;
-  let currentProgress = 0;
   const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // Ensure video is paused so it never autoplays independently of scroll
-  video.pause();
-  video.currentTime = 0;
-
-  function onScroll() {
-    const rect = container.getBoundingClientRect();
-    const maxScroll = rect.height - window.innerHeight;
-    if (maxScroll <= 0) return;
-
-    // Normalized progress (0 to 1) through the pinned hero section
-    const progress = Math.max(0, Math.min(1, -rect.top / maxScroll));
-    currentProgress = progress;
-
-    const duration = video.duration || 10.0;
-    targetTime = progress * duration;
-  }
-
-  // Animation Loop: Updates video frame seeking with smooth lerp
-  function renderLoop() {
-    if (!isReducedMotion && video.readyState >= 1) {
-      // Smooth interpolation for silky scrubbing
-      currentScrubTime += (targetTime - currentScrubTime) * 0.22;
-
-      // Only seek if difference is noticeable and video is not currently seeking
-      if (Math.abs(video.currentTime - currentScrubTime) > 0.04 && !video.seeking) {
-        try {
-          video.currentTime = currentScrubTime;
-        } catch (e) {
-          // Ignore seeking abort errors during rapid scrolls
-        }
-      }
-    }
-
-    // Update narrative beats
-    updateNarrativeBeats(currentProgress);
-
-    // Update scrub indicators
-    if (scrubFill) {
-      scrubFill.style.width = `${currentProgress * 100}%`;
-    }
-    if (scrubPercent) {
-      scrubPercent.textContent = `${Math.round(currentProgress * 100)}%`;
-    }
-
-    requestAnimationFrame(renderLoop);
-  }
-
-  // Narrative Beats synced to scroll position
-  const beats = [
-    { id: 'beat-1', start: 0.00, end: 0.25 }, // Establishing Molar & Pedestal
-    { id: 'beat-2', start: 0.25, end: 0.50 }, // Orbital Turquoise Ring
-    { id: 'beat-3', start: 0.50, end: 0.75 }, // Enamel Macro Crystallography
-    { id: 'beat-4', start: 0.75, end: 1.00 }  // Final Resolution & Centered Tooth
-  ];
-
-  function updateNarrativeBeats(progress) {
-    beats.forEach((beat, index) => {
-      const el = document.getElementById(beat.id);
-      if (!el) return;
-
-      const isActive = progress >= beat.start && progress <= beat.end;
-      if (isActive) {
-        el.classList.add('active');
-      } else {
-        el.classList.remove('active');
-      }
-
-      // Update scrub pips
-      if (beatPills[index]) {
-        if (isActive) {
-          beatPills[index].classList.add('text-primaryMint', 'border-primaryMint', 'bg-primaryMint/20');
-          beatPills[index].classList.remove('text-slate-400', 'border-transparent');
-        } else {
-          beatPills[index].classList.remove('text-primaryMint', 'border-primaryMint', 'bg-primaryMint/20');
-          beatPills[index].classList.add('text-slate-400', 'border-transparent');
-        }
-      }
+  // Ensure autoplay on load, catch any browser policy restrictions gracefully
+  const playPromise = video.play();
+  if (playPromise !== undefined) {
+    playPromise.catch(() => {
+      // Autoplay was prevented; fallback poster image is visible
+      console.log('Video autoplay prevented by browser; fallback poster active.');
     });
   }
 
-  // Click Beat Pips to Smoothly Scroll to that Moment
-  beatPills.forEach(pill => {
-    pill.addEventListener('click', () => {
-      const targetPct = parseFloat(pill.getAttribute('data-target-pct') || '0');
-      const rect = container.getBoundingClientRect();
-      const maxScroll = rect.height - window.innerHeight;
-      const targetY = window.scrollY + rect.top + (targetPct * maxScroll);
-      window.scrollTo({
-        top: targetY,
-        behavior: 'smooth'
-      });
-    });
+  // Smooth loop handling without visual jumps
+  video.addEventListener('ended', () => {
+    video.currentTime = 0;
+    video.play().catch(() => {});
   });
 
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onScroll);
+  // Performance optimization: Pause video when hero is scrolled out of view
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          if (!isReducedMotion) video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      });
+    }, { threshold: 0.1 });
+    observer.observe(heroSection);
+  }
 
-  // Initialize
-  onScroll();
-  requestAnimationFrame(renderLoop);
+  // Subtle natural scroll parallax (Lightweight, non-blocking)
+  if (!isReducedMotion) {
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrollY = window.scrollY;
+          const heroHeight = heroSection.offsetHeight;
+          if (scrollY <= heroHeight) {
+            const translateY = scrollY * 0.22;
+            video.style.transform = `translate(-50%, calc(-50% + ${translateY}px)) scale(1.05)`;
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+  }
 }
 
 /* ==========================================================================
-   3. LIVE CLINIC OPERATING STATUS
+   3. LIVE CLINIC OPERATING STATUS (IST / BENGALURU LOCAL TIME)
    ========================================================================== */
 function initLiveClinicStatus() {
   const statusElements = document.querySelectorAll('.live-clinic-status');
   if (!statusElements.length) return;
 
   function checkStatus() {
-    const now = new Date();
-    const hours = now.getHours();
-    const isOpen = hours >= 10 && hours < 21;
+    // Determine current time in Bengaluru (Asia/Kolkata timezone)
+    try {
+      const now = new Date();
+      const options = { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: 'numeric', hour12: false };
+      const formatter = new Intl.DateTimeFormat([], options);
+      const parts = formatter.formatToParts(now);
+      const hourPart = parts.find(p => p.type === 'hour');
+      const hours = hourPart ? parseInt(hourPart.value, 10) : now.getHours();
 
-    statusElements.forEach(el => {
-      if (isOpen) {
+      const isOpen = hours >= 10 && hours < 21;
+
+      statusElements.forEach(el => {
+        if (isOpen) {
+          el.innerHTML = `
+            <span class="inline-flex w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34D399]"></span>
+            <span class="text-teal-100 font-semibold text-xs tracking-wide">Open Today in Madiwala · 10 AM – 9 PM</span>
+          `;
+        } else {
+          el.innerHTML = `
+            <span class="inline-flex w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_#FBBF24]"></span>
+            <span class="text-amber-100 font-semibold text-xs tracking-wide">Opens Daily at 10:00 AM · Appointments Available</span>
+          `;
+        }
+      });
+    } catch (e) {
+      // Fallback
+      statusElements.forEach(el => {
         el.innerHTML = `
-          <span class="inline-flex w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span class="text-teal-200 font-medium">Open Today until 9:00 PM</span>
+          <span class="inline-flex w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+          <span class="text-teal-100 font-semibold text-xs">Open 10:00 AM – 9:00 PM Daily</span>
         `;
-      } else {
-        el.innerHTML = `
-          <span class="inline-flex w-2 h-2 rounded-full bg-amber-400"></span>
-          <span class="text-amber-200 font-medium">Opens Tomorrow at 10:00 AM</span>
-        `;
-      }
-    });
+      });
+    }
   }
 
   checkStatus();
@@ -553,46 +512,20 @@ function initPatientJourney() {
 }
 
 /* ==========================================================================
-   7. PATIENT TESTIMONIALS SLIDER
+   7. PATIENT COMFORT & FIRST VISIT ACCORDION / PILLARS
    ========================================================================== */
-function initTestimonialsSlider() {
-  const sliderTrack = document.getElementById('testimonials-track');
-  const prevBtn = document.getElementById('testimonials-prev');
-  const nextBtn = document.getElementById('testimonials-next');
-  if (!sliderTrack || !prevBtn || !nextBtn) return;
-
-  let currentIndex = 0;
-  const cards = sliderTrack.children;
-  const totalCards = cards.length;
-
-  function updateSlider() {
-    const cardWidth = cards[0].offsetWidth + 24;
-    sliderTrack.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
-  }
-
-  nextBtn.addEventListener('click', () => {
-    const maxVisible = window.innerWidth >= 1024 ? 3 : (window.innerWidth >= 640 ? 2 : 1);
-    const maxIndex = Math.max(0, totalCards - maxVisible);
-    if (currentIndex < maxIndex) {
-      currentIndex++;
-    } else {
-      currentIndex = 0;
-    }
-    updateSlider();
+function initPatientComfort() {
+  const comfortCards = document.querySelectorAll('.comfort-card');
+  comfortCards.forEach(card => {
+    card.addEventListener('click', () => {
+      comfortCards.forEach(c => {
+        c.classList.remove('border-primaryMint', 'bg-paleMint/20', 'shadow-md');
+        c.classList.add('border-teal-900/10', 'bg-white');
+      });
+      card.classList.remove('border-teal-900/10', 'bg-white');
+      card.classList.add('border-primaryMint', 'bg-paleMint/20', 'shadow-md');
+    });
   });
-
-  prevBtn.addEventListener('click', () => {
-    const maxVisible = window.innerWidth >= 1024 ? 3 : (window.innerWidth >= 640 ? 2 : 1);
-    const maxIndex = Math.max(0, totalCards - maxVisible);
-    if (currentIndex > 0) {
-      currentIndex--;
-    } else {
-      currentIndex = maxIndex;
-    }
-    updateSlider();
-  });
-
-  window.addEventListener('resize', updateSlider);
 }
 
 /* ==========================================================================
@@ -643,5 +576,105 @@ function initCopyrightYear() {
   const yr = new Date().getFullYear();
   yearEls.forEach(el => {
     el.textContent = yr;
+  });
+}
+
+/* ==========================================================================
+   10. CENTRALIZED IMAGE FALLBACK & ERROR HANDLER (NO BROKEN VISUALS)
+   ========================================================================== */
+function initImageFallbacks() {
+  const inlineSvgFallback = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400' viewBox='0 0 600 400'%3E%3Crect width='600' height='400' fill='%23002B2B'/%3E%3Crect x='10' y='10' width='580' height='380' rx='16' fill='%23073C38' stroke='%232DD4BF' stroke-opacity='0.25' stroke-width='2'/%3E%3Cpath d='M300 130c-25 0-45 15-53 38-12 34-6 72 2 97 7 21 17 25 25 25 12 0 17-17 26-17s14 17 26 17c8 0 18-4 25-25 8-25 14-63 2-97-8-23-28-38-53-38z' fill='none' stroke='%232DD4BF' stroke-width='6' stroke-linejoin='round'/%3E%3Ctext x='300' y='320' fill='%23CFF8EE' font-family='sans-serif' font-size='16' font-weight='bold' text-anchor='middle' letter-spacing='1'%3EYOUR DENTAL CLINIC BY S2%3C/text%3E%3Ctext x='300' y='345' fill='%23A9C5B7' font-family='sans-serif' font-size='12' text-anchor='middle'%3EMadiwala, Bengaluru%3C/text%3E%3C/svg%3E";
+
+  window.handleImageFallback = function(img) {
+    if (!img) return;
+    img.onerror = null; // Prevent infinite error recursion
+    img.src = inlineSvgFallback;
+    img.classList.add('img-fallback-active');
+  };
+
+  const allImages = document.querySelectorAll('img');
+  allImages.forEach(img => {
+    // If image has already failed before JS execution
+    if (img.complete && img.naturalWidth === 0) {
+      window.handleImageFallback(img);
+    } else {
+      img.addEventListener('error', () => {
+        window.handleImageFallback(img);
+      });
+    }
+  });
+}
+
+/* ==========================================================================
+   11. FLOATING DENTAL CONCIERGE & QUICK FAQ PANEL
+   ========================================================================== */
+function initDentalConcierge() {
+  const triggerBtn = document.getElementById('concierge-trigger');
+  const panel = document.getElementById('concierge-panel');
+  const closeBtn = document.getElementById('concierge-close');
+  const faqToggles = document.querySelectorAll('.concierge-faq-q');
+
+  if (!triggerBtn || !panel) return;
+
+  function togglePanel() {
+    const isOpen = panel.classList.contains('open');
+    if (isOpen) {
+      panel.classList.remove('open');
+    } else {
+      panel.classList.add('open');
+    }
+  }
+
+  triggerBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    togglePanel();
+  });
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      panel.classList.remove('open');
+    });
+  }
+
+  // Close when clicking outside panel
+  document.addEventListener('click', (e) => {
+    if (panel.classList.contains('open') && !panel.contains(e.target) && e.target !== triggerBtn && !triggerBtn.contains(e.target)) {
+      panel.classList.remove('open');
+    }
+  });
+
+  // Accordion behavior for quick FAQ questions
+  faqToggles.forEach(toggle => {
+    toggle.addEventListener('click', () => {
+      const parent = toggle.parentElement;
+      const answer = parent.querySelector('.concierge-faq-a');
+      const arrow = toggle.querySelector('.faq-arrow');
+      const isExpanded = !answer.classList.contains('hidden');
+
+      // Collapse all answers in concierge
+      document.querySelectorAll('.concierge-faq-a').forEach(a => a.classList.add('hidden'));
+      document.querySelectorAll('.faq-arrow').forEach(arr => arr.classList.remove('rotate-180'));
+
+      if (!isExpanded) {
+        answer.classList.remove('hidden');
+        if (arrow) arrow.classList.add('rotate-180');
+      }
+    });
+  });
+}
+
+/* ==========================================================================
+   12. MASCOT MICRO-INTERACTIONS
+   ========================================================================== */
+function initMascotInteractions() {
+  const mascots = document.querySelectorAll('.mascot-interactive');
+  mascots.forEach(mascot => {
+    mascot.addEventListener('mouseenter', () => {
+      mascot.style.transition = 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+      mascot.style.transform = 'translateY(-6px) scale(1.04) rotate(1.5deg)';
+    });
+    mascot.addEventListener('mouseleave', () => {
+      mascot.style.transform = 'translateY(0) scale(1) rotate(0deg)';
+    });
   });
 }
